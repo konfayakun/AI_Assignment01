@@ -1,17 +1,18 @@
 package sudoku;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 
 public class main {
+    final String METHOD_NAME="NAIVE";
     Stack<State> fringe=new Stack<>();
     long expandedStatesCount=0L,backtracks=0L,sum=0L;
     long startTime;
+    ArrayList<String> details=new ArrayList<>();
 
     public main() throws IOException {
         System.out.println("salam");
@@ -22,6 +23,7 @@ public class main {
         for(int i=0;i<81;i++){
             bufferOptions.add(new Tile((ArrayList<Integer>) variableDomain.clone(),i,0));
         }
+
         List<String> initialBoards= Files.readAllLines(Paths.get("euler.txt"));
         for(String board:initialBoards) {
             State initialState = new State(bufferOptions);
@@ -39,19 +41,21 @@ public class main {
             while (!fringe.isEmpty())
                 expand();
         }
-        System.out.println(sum);
+        Files.write(Paths.get(METHOD_NAME+"_data.txt"),details, StandardOpenOption.CREATE);
     }
     void expand(){
         State finalState=fringe.peek();
         expandedStatesCount++;
-        int index=getNext(finalState);
+        int index= getNextNaive(finalState);
         if(index==82){
+            long elapsedTime=(System.currentTimeMillis()-startTime);
             sum+=finalState.tiles.get(0).value*100+finalState.tiles.get(1).value*10+finalState.tiles.get(2).value;
             System.out.println("solved!");
             System.out.println(finalState);
             System.out.println("expanded states :"+expandedStatesCount);
             System.out.println("backtracks :"+backtracks);
-            System.out.println("solve time in ms: "+(System.currentTimeMillis()-startTime));
+            System.out.println("solve time in ms: "+elapsedTime);
+            details.add(expandedStatesCount+","+backtracks+","+elapsedTime);
             fringe.removeAllElements();
             return;
         }
@@ -80,11 +84,13 @@ public class main {
         }
         return newState;
     }
-    int getNext(State state){
+
+    int getNextNaive(State state){
         for(int i=0;i<81;i++)
             if(state.tiles.get(i).value==0) return i;
         return 82;
     }
+    
 
     public static void main(String[] args) throws IOException {
         new main();
