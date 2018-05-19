@@ -8,8 +8,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class main {
-    int method=0;
-    final String[] METHOD_NAMES={"naive","mrv","mrv+lcv"};
+    int orderingMethod =0,checkingMethod=0;
+    final String[] ORDERING_METHOD_NAMES ={"0","1","2"};
+    final String[] CHECKING_METHOD_NAMES ={"0","1"};
+
     Stack<State> fringe=new Stack<>();
     long expandedStatesCount=0L,backtracks=0L,sum=0L;
     long startTime;
@@ -25,7 +27,8 @@ public class main {
             bufferOptions.add(new Tile((ArrayList<Integer>) variableDomain.clone(),i,0));
         }
         List<String> initialBoards= Files.readAllLines(Paths.get("magictour.txt"));
-        for(method=0;method<METHOD_NAMES.length;method++) {
+        for(checkingMethod=0;checkingMethod<CHECKING_METHOD_NAMES.length;checkingMethod++)
+        for(orderingMethod =1; orderingMethod < ORDERING_METHOD_NAMES.length; orderingMethod++) {
             int ind=0;
             for (String board : initialBoards) {
                 ind++;
@@ -34,7 +37,9 @@ public class main {
                 for (char num : board.toCharArray()) {
                     index++;
                     if (num == '.') continue;
+//                    System.out.println(initialState);
                     initialState = applyOption(initialState, index, num - '0');
+//                    if(initialState==null)System.exit(0);
                 }
                 startTime = System.currentTimeMillis();
                 expandedStatesCount = 0L;
@@ -45,8 +50,8 @@ public class main {
                     expand();
 
             }
-            System.out.println(METHOD_NAMES[method]+" has been finished");
-            Files.write(Paths.get(METHOD_NAMES[method] + "_data.txt"), details, StandardOpenOption.CREATE);
+            System.out.println(ORDERING_METHOD_NAMES[orderingMethod]+"_"+CHECKING_METHOD_NAMES[checkingMethod]+" has been finished");
+            Files.write(Paths.get(""+orderingMethod+checkingMethod + "_data.txt"), details, StandardOpenOption.CREATE);
             details.clear();
         }
         System.out.println(sum);
@@ -54,7 +59,7 @@ public class main {
     void expand(){
         State finalState=fringe.peek();
         expandedStatesCount++;
-        int index= getNext(finalState,method);
+        int index= getNext(finalState, orderingMethod);
         if(index==82){
             long elapsedTime=(System.currentTimeMillis()-startTime);
             sum+=finalState.tiles.get(0).value*100+finalState.tiles.get(1).value*10+finalState.tiles.get(2).value;
@@ -74,7 +79,7 @@ public class main {
         }
         Tile tile=finalState.tiles.get(index);
         int currentStep;
-        if(method==3) { //lcv
+        if(orderingMethod ==3) { //lcv
             int bestValue = -1, minConstraining = Integer.MAX_VALUE;
             for (int value : tile.options) {
                 int bufferConstraining = 0;
@@ -101,7 +106,9 @@ public class main {
         }
         else
             currentStep=tile.options.remove(0); // remove current step form top stack state
-        fringe.push(applyOption(finalState,tile.tileIndex,currentStep));
+        State toAdd=applyOption(finalState,tile.tileIndex,currentStep);
+        if(toAdd!=null)
+            fringe.push(toAdd);
         expand();
     }
     State applyOption(State initial, int tileIndex, int currentStep){
@@ -109,12 +116,20 @@ public class main {
         int i=tileIndex/9,j=tileIndex%9;
         newState.tiles.get(tileIndex).value=currentStep;
         for(int offset=0;offset<9;offset++){
-            newState.tiles.get((offset)*9+j).options.remove(Integer.valueOf(currentStep)); //row
-            newState.tiles.get(i*9+offset).options.remove(Integer.valueOf(currentStep)); //col
+            Tile rTile=newState.tiles.get((offset)*9+j);
+            Tile cTile=newState.tiles.get(i*9+offset);
+            rTile.options.remove(Integer.valueOf(currentStep)); //row
+            cTile.options.remove(Integer.valueOf(currentStep)); //col
+            if(checkingMethod==1){
+                if(rTile.value==0 && rTile.options.isEmpty() ||cTile.value==0 && cTile.options.isEmpty()) return null;
+
+            }
         }
         for(int xoffset=0;xoffset<3;xoffset++) {
             for (int yoffset = 0; yoffset < 3; yoffset++) {
-                newState.tiles.get(((i/3)*3+xoffset)*9+(j/3)*3+yoffset).options.remove(Integer.valueOf(currentStep)); //block
+                Tile bTile=newState.tiles.get(((i/3)*3+xoffset)*9+(j/3)*3+yoffset);
+                bTile.options.remove(Integer.valueOf(currentStep)); //block
+                if(checkingMethod==1 && bTile.value==0 && bTile.options.isEmpty())return null;
             }
         }
         return newState;
@@ -122,7 +137,7 @@ public class main {
 
     int getNext(State state,int method){
         List<Tile> emptyTiles=state.tiles.stream().filter(tile-> tile.value==0).collect(Collectors.toList()); // get empty tiles
-        if(emptyTiles.isEmpty())return 82;                                                                   // solved if all tiles are not empty
+        if(emptyTiles.isEmpty())return 82;                                                                    // solved if all tiles are not empty
         Comparator<Tile> comparator=null;
         if(method==0)
             comparator=Comparator.comparingInt(tile->tile.tileIndex);
