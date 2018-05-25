@@ -7,17 +7,17 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class main {
+class Main {
     int orderingMethod =0,checkingMethod=0;
     final String[] ORDERING_METHOD_NAMES ={"0","1","2"};
-    final String[] CHECKING_METHOD_NAMES ={"0","1"};
+    final String[] CHECKING_METHOD_NAMES ={"0","1","2","3"};
 
     Stack<State> fringe=new Stack<>();
     long expandedStatesCount=0L,backtracks=0L,sum=0L;
     long startTime;
     ArrayList<String> details=new ArrayList<>();
 
-    public main() throws IOException {
+    public Main() throws IOException {
         System.out.println("salam");
         ArrayList<Tile> bufferOptions=new ArrayList<>();
         Integer varDomain[]={1,2,3,4,5,6,7,8,9};
@@ -107,6 +107,12 @@ public class main {
         else
             currentStep=tile.options.remove(0); // remove current step form top stack state
         State toAdd=applyOption(finalState,tile.tileIndex,currentStep);
+        if(checkingMethod==2 || checkingMethod==3){
+            boolean isConsistent=false;
+            while(!isConsistent){
+                isConsistent=applyArcConsistency(toAdd);
+            }
+        }
         if(toAdd!=null)
             fringe.push(toAdd);
         expand();
@@ -120,7 +126,7 @@ public class main {
             Tile cTile=newState.tiles.get(i*9+offset);
             rTile.options.remove(Integer.valueOf(currentStep)); //row
             cTile.options.remove(Integer.valueOf(currentStep)); //col
-            if(checkingMethod==1){
+            if(checkingMethod%2==1){
                 if(rTile.value==0 && rTile.options.isEmpty() ||cTile.value==0 && cTile.options.isEmpty()) return null;
 
             }
@@ -129,10 +135,55 @@ public class main {
             for (int yoffset = 0; yoffset < 3; yoffset++) {
                 Tile bTile=newState.tiles.get(((i/3)*3+xoffset)*9+(j/3)*3+yoffset);
                 bTile.options.remove(Integer.valueOf(currentStep)); //block
-                if(checkingMethod==1 && bTile.value==0 && bTile.options.isEmpty())return null;
+                if(checkingMethod%2==1 && bTile.value==0 && bTile.options.isEmpty())return null;
             }
         }
         return newState;
+    }
+    boolean applyArcConsistency(State target){
+        boolean isConsistent=true;
+        for(Tile tile:target.tiles){
+            if(tile.value!=0)continue;
+            int i = tile.tileIndex / 9, j = tile.tileIndex % 9;
+            ArrayList<Integer> toRemove=new ArrayList<>();
+            values:for(int value:tile.options) { //for each option in tail...
+
+                for (int offset = 0; offset < 9; offset++) { //row
+                    Tile rTile=target.tiles.get((offset) * 9 + j);
+                    if(rTile.value!=0)continue;
+                    if(rTile.options.size()==1 && rTile.options.contains(value)){
+                        isConsistent=false;
+                        toRemove.add(value);
+                        continue values;
+                    }
+                }
+
+                for (int offset = 0; offset < 9; offset++) { //col
+                    Tile cTile=target.tiles.get(i * 9 + offset);
+                    if(cTile.value!=0)continue;
+                    if(cTile.options.size()==1 && cTile.options.contains(value)){
+                        isConsistent=false;
+                        toRemove.add(value);
+                        continue values;
+                    }
+                }
+
+                for (int xoffset = 0; xoffset < 3; xoffset++) { //block
+                    for (int yoffset = 0; yoffset < 3; yoffset++) {
+                        Tile bTile=target.tiles.get(((i / 3) * 3 + xoffset) * 9 + (j / 3) * 3 + yoffset);
+                        if(bTile.value!=0)continue;
+                        if(bTile.options.size()==1 && bTile.options.contains(value)){
+                            isConsistent=false;
+                            toRemove.add(value);
+                            continue values;
+                        }
+                    }
+                }
+            }
+            tile.options.removeAll(toRemove);
+            toRemove.clear();
+        }
+        return isConsistent;
     }
 
     int getNext(State state,int method){
@@ -148,6 +199,6 @@ public class main {
 
 
     public static void main(String[] args) throws IOException {
-        new main();
+        new Main();
     }
 }

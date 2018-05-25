@@ -2,7 +2,7 @@ package sudoku;
 
 import java.util.ArrayList;
 
-public class State {
+class State {
     ArrayList<Tile> tiles=new ArrayList<>(); // indexed from 1 to 81 each accorded to one tile
     public State(ArrayList<Tile> tiles){
         tiles.forEach(tile->this.tiles.add(((Tile) tile.clone())));

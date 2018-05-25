@@ -2,7 +2,7 @@ package sudoku;
 
 import java.util.ArrayList;
 
-public class Tile implements Cloneable{
+class Tile implements Cloneable{
     ArrayList<Integer> options;
     int tileIndex,value;
 
