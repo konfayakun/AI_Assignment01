@@ -16,26 +16,17 @@ public class HillClimbing {
     }
     public void solve(){
         currentState=Utils.generateRandomState(boardSize);
-        ArrayList<State> neighborhood=new ArrayList<>();
+        ArrayList<State> neighborhood;
         for(int step=0;step<numberOfIterations;step++){
-            neighborhood.clear();
-            for(int i=0;i<boardSize-1;i++){
-                for(int j=i+1;j<boardSize;j++){
-                    if(currentState.board[i]==j)continue;
-//                    if(Math.random()>0.5D)
-                    neighborhood.add(Utils.swap(currentState,i,j)); //swap strategy
-
-                    neighborhood.add(Utils.move(currentState,i,j));
-                }
-            }
-            State candidate=Collections.min(neighborhood,Comparator.comparingInt(Utils::heuristic));
-            if(Utils.heuristic(candidate)<Utils.heuristic(currentState)) {
-                currentState = candidate;
+            neighborhood=getNeighborhood(currentState);
+            State newState=getNext(neighborhood,currentState);
+            if(newState!=null) {
+                currentState = newState;
                 stateChanges++;
             }
             else{
                 if(verbMode) {
-                    System.out.println("reached to a local minimum!");
+                    System.out.println("stuck in local minimum!");
                     System.out.println(currentState);
                     System.out.println(Utils.heuristic(currentState));
                 }
@@ -51,5 +42,24 @@ public class HillClimbing {
 //            System.out.println(Utils.heuristic(currentState));
         }
 //        System.out.println("Iteration limit has been reached! Cannot solve problem in this limit!");
+    }
+    protected ArrayList<State> getNeighborhood(State currentState){
+        ArrayList<State> neighborhood=new ArrayList<>();
+        for(int i=0;i<boardSize-1;i++){
+            for(int j=i+1;j<boardSize;j++){
+                if(currentState.board[i]==j)continue;
+//                    if(Math.random()>0.5D)
+                neighborhood.add(Utils.swap(currentState,i,j)); //swap strategy
+                neighborhood.add(Utils.move(currentState,i,j));
+            }
+        }
+        return neighborhood;
+    }
+    protected State getNext(ArrayList<State> neighborhood,State currentState){
+        State candidate=Collections.min(neighborhood,Comparator.comparingInt(Utils::heuristic));
+        if(Utils.heuristic(candidate)<Utils.heuristic(currentState)) {
+            return candidate;
+        }
+        return null;
     }
 }

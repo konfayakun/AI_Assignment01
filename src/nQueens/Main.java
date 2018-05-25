@@ -10,11 +10,20 @@ public class Main {
     }
 
     public Main() {
-        HillClimbing hc=new HillClimbing(5,1000000L,false);
+        int boardSize=5;
+        long numberOfIterations=1000000L;
+        boolean showAllSolutions=false;
+        System.out.println("General parameters:");
+        System.out.printf("Board size:%d ,number of iterations:%d ,show all solutions:%s \n\n",boardSize,numberOfIterations,(showAllSolutions)?"Yes":"No");
+        System.out.println("Hill Climbing:\n");
+        HillClimbing hc=new HillClimbing(boardSize,numberOfIterations,showAllSolutions);
         hc.solve();
-        System.out.println("--------------");
-        HillClimbing hcr=new HillClimbing_RandomRestart(5,1000000L,true,0.99999D);
+        System.out.println("--------------\nHill Climbing using random restart with restart probability of 0.99999:\n");
+        HillClimbing hcr=new HillClimbing_RandomRestart(boardSize,numberOfIterations,showAllSolutions,0.99999D);
         hcr.solve();
+        System.out.println("--------------\nSimulated Annealing:\n");
+        HillClimbing sim=new SimulatedAnnealing(boardSize,numberOfIterations,showAllSolutions);
+        sim.solve();
     }
 
 
