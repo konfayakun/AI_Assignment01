@@ -39,9 +39,7 @@ public class HillClimbing {
                 }
                 if(!showAllSolutions) break;
             }
-//            System.out.println(Utils.heuristic(currentState));
         }
-//        System.out.println("Iteration limit has been reached! Cannot solve problem in this limit!");
     }
     protected ArrayList<State> getNeighborhood(State currentState){
         ArrayList<State> neighborhood=new ArrayList<>();
