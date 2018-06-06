@@ -3,13 +3,13 @@ package nQueens;
 import java.util.*;
 
 public class HillClimbing {
-    int boardSize;
+    private int boardSize;
     long numberOfIterations,stateChanges=0L;
     boolean showAllSolutions;
     boolean verbMode=true;
     State currentState;
 
-    public HillClimbing(int boardSize, long numberOfIterations, boolean showAllSolutions) {
+    HillClimbing(int boardSize, long numberOfIterations, boolean showAllSolutions) {
         this.boardSize = boardSize;
         this.numberOfIterations = numberOfIterations;
         this.showAllSolutions = showAllSolutions;
@@ -41,7 +41,7 @@ public class HillClimbing {
             }
         }
     }
-    protected ArrayList<State> getNeighborhood(State currentState){
+    private ArrayList<State> getNeighborhood(State currentState){
         ArrayList<State> neighborhood=new ArrayList<>();
         for(int i=0;i<boardSize-1;i++){
             for(int j=i+1;j<boardSize;j++){

@@ -4,9 +4,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class HillClimbing_RandomRestart extends HillClimbing{
-    int restartCount=-1;
-    double probabilityOfRestart;
-    public HillClimbing_RandomRestart(int boardSize, long numberOfIterations, boolean showAllSolutions,double probabilityOfRestart) {
+    private int restartCount=-1;
+    private double probabilityOfRestart;
+    HillClimbing_RandomRestart(int boardSize, long numberOfIterations, boolean showAllSolutions, double probabilityOfRestart) {
         super(boardSize,numberOfIterations,showAllSolutions);
         this.probabilityOfRestart=probabilityOfRestart;
         this.verbMode=false;

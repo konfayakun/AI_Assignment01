@@ -8,30 +8,29 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class Main {
-    int orderingMethod =0,checkingMethod=0;
-    final String[] ORDERING_METHOD_NAMES ={"0","1","2"};
-    final String[] CHECKING_METHOD_NAMES ={"0","1","2","3"};
+    private int orderingMethod =0,checkingMethod=0;
+    private final String[] ORDERING_METHOD_NAMES ={"0","1","2"};
+    private final String[] CHECKING_METHOD_NAMES ={"0","1","2","3"};
 
-    Stack<State> fringe=new Stack<>();
-    long expandedStatesCount=0L,backtracks=0L,sum=0L;
-    long startTime;
-    ArrayList<String> details=new ArrayList<>();
+    private Stack<State> fringe=new Stack<>();
+    private long expandedStatesCount=0L,backtracks=0L,sum=0L;
+    private long startTime;
+    private ArrayList<String> details=new ArrayList<>();
 
-    public Main() throws IOException {
+    private Main() throws IOException {
         System.out.println("salam");
         ArrayList<Tile> bufferOptions=new ArrayList<>();
         Integer varDomain[]={1,2,3,4,5,6,7,8,9};
-        ArrayList<Integer> variableDomain= new ArrayList<>();
-        Arrays.stream(varDomain).forEach(e->variableDomain.add(e));
+        ArrayList<Integer> variableDomain = new ArrayList<>(Arrays.asList(varDomain));
         for(int i=0;i<81;i++){
             bufferOptions.add(new Tile((ArrayList<Integer>) variableDomain.clone(),i,0));
         }
         List<String> initialBoards= Files.readAllLines(Paths.get("magictour.txt"));
+
         for(checkingMethod=0;checkingMethod<CHECKING_METHOD_NAMES.length;checkingMethod++)
         for(orderingMethod =1; orderingMethod < ORDERING_METHOD_NAMES.length; orderingMethod++) {
-            int ind=0;
+            long sTime=System.currentTimeMillis();
             for (String board : initialBoards) {
-                ind++;
                 State initialState = new State(bufferOptions);
                 int index = -1;
                 for (char num : board.toCharArray()) {
@@ -51,12 +50,13 @@ class Main {
 
             }
             System.out.println(ORDERING_METHOD_NAMES[orderingMethod]+"_"+CHECKING_METHOD_NAMES[checkingMethod]+" has been finished");
+            System.out.println("Elapsed time: "+(System.currentTimeMillis()-sTime)/1000+"sec");
             Files.write(Paths.get(""+orderingMethod+checkingMethod + "_data.txt"), details, StandardOpenOption.CREATE);
             details.clear();
         }
         System.out.println(sum);
     }
-    void expand(){
+    private void expand(){
         State finalState=fringe.peek();
         expandedStatesCount++;
         int index= getNext(finalState, orderingMethod);
@@ -85,9 +85,9 @@ class Main {
                 int bufferConstraining = 0;
                 int i = index / 9, j = index % 9;
                 for (int offset = 0; offset < 9; offset++) {
-                    if (finalState.tiles.get((offset) * 9 + j).options.contains(Integer.valueOf(value)))
+                    if (finalState.tiles.get((offset) * 9 + j).options.contains(value))
                         bufferConstraining++; //row
-                    if (finalState.tiles.get(i * 9 + offset).options.contains(Integer.valueOf(value)))
+                    if (finalState.tiles.get(i * 9 + offset).options.contains(value))
                         bufferConstraining++; //col
                 }
                 for (int xoffset = 0; xoffset < 3; xoffset++) {
@@ -117,7 +117,7 @@ class Main {
             fringe.push(toAdd);
         expand();
     }
-    State applyOption(State initial, int tileIndex, int currentStep){
+    private State applyOption(State initial, int tileIndex, int currentStep){
         State newState=new State(initial);
         int i=tileIndex/9,j=tileIndex%9;
         newState.tiles.get(tileIndex).value=currentStep;
@@ -140,7 +140,7 @@ class Main {
         }
         return newState;
     }
-    boolean applyArcConsistency(State target){
+    private boolean applyArcConsistency(State target){
         boolean isConsistent=true;
         for(Tile tile:target.tiles){
             if(tile.value!=0)continue;
@@ -186,7 +186,7 @@ class Main {
         return isConsistent;
     }
 
-    int getNext(State state,int method){
+    private int getNext(State state, int method){
         List<Tile> emptyTiles=state.tiles.stream().filter(tile-> tile.value==0).collect(Collectors.toList()); // get empty tiles
         if(emptyTiles.isEmpty())return 82;                                                                    // solved if all tiles are not empty
         Comparator<Tile> comparator=null;

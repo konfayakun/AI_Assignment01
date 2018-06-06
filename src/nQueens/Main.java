@@ -9,7 +9,7 @@ public class Main {
         new Main();
     }
 
-    public Main() {
+    private Main() {
         int boardSize=8;
         long numberOfIterations=3000L;
         boolean showAllSolutions=true;

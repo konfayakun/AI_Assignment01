@@ -3,12 +3,12 @@ package nQueens;
 import java.util.*;
 
 public class Genetic {
-    int population,boardSize;
-    long numberOfIterations;
-    double mutationRatio,crossoverRatio;
-    boolean findAllSolutions;
+    private int population,boardSize;
+    private long numberOfIterations;
+    private double mutationRatio,crossoverRatio;
+    private boolean findAllSolutions;
 
-    public Genetic(int boardSize,long numberOfIterations, int population, double mutationRatio, double crossoverRatio,boolean findAllSolutions) {
+    Genetic(int boardSize, long numberOfIterations, int population, double mutationRatio, double crossoverRatio, boolean findAllSolutions) {
         this.boardSize=boardSize;
         this.numberOfIterations = numberOfIterations;
         this.population = population;
