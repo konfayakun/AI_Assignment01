@@ -20,12 +20,12 @@ public class Main {
         Greedy_Solver greedySolver1=new Greedy_Solver(initialState,Utils::heuristic1);
         Greedy_Solver greedySolver2=new Greedy_Solver(initialState,Utils::heuristic2);
 
-        System.out.println(bfsSolver.solve().path);
-        System.out.println(dfsSolver.solve().path);
+//        System.out.println(bfsSolver.solve().path);
+//        System.out.println(dfsSolver.solve().path);
         System.out.println(ucsSolver.solve().path);
-        System.out.println(id.solve().path);
-        System.out.println(greedySolver1.solve().path);
-        System.out.println(greedySolver2.solve().path);
+//        System.out.println(id.solve().path);
+//        System.out.println(greedySolver1.solve().path);
+//        System.out.println(greedySolver2.solve().path);
     }
 
 }

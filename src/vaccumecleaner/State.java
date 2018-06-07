@@ -7,7 +7,7 @@ public class State implements Cloneable{
     int[][] board;
     int collectedGarbage,boardSize,cost,visibleCells;
     String path;
-    boolean[][] visibleByAgent;
+    private boolean[][] visibleByAgent;
 
     Point agentLocation;
 
@@ -37,22 +37,22 @@ public class State implements Cloneable{
         String newPath=path+action;
         int newCollected=collectedGarbage;
         int cost=2;
-        try {
+        try {  // simple try catch hack for checking bounds of the array ;)
             switch (action) {
                 case "r":
-                    newBoard[agentLocation.x + 1][agentLocation.y] = board[agentLocation.x + 1][agentLocation.y];
+                    newBoard[agentLocation.x + 1][agentLocation.y] = board[agentLocation.x + 1][agentLocation.y];//raising error if location is not accessible
                     newAgentLocation = new Point(agentLocation.x + 1, agentLocation.y);
                     break;
                 case "l":
-                    newBoard[agentLocation.x - 1][agentLocation.y] = board[agentLocation.x - 1][agentLocation.y];
+                    newBoard[agentLocation.x - 1][agentLocation.y] = board[agentLocation.x - 1][agentLocation.y];//raising error if location is not accessible
                     newAgentLocation = new Point(agentLocation.x - 1, agentLocation.y);
                     break;
                 case "u":
-                    newBoard[agentLocation.x][agentLocation.y - 1] = board[agentLocation.x][agentLocation.y - 1];
+                    newBoard[agentLocation.x][agentLocation.y - 1] = board[agentLocation.x][agentLocation.y - 1];//raising error if location is not accessible
                     newAgentLocation = new Point(agentLocation.x, agentLocation.y - 1);
                     break;
                 case "d":
-                    newBoard[agentLocation.x][agentLocation.y + 1] = board[agentLocation.x][agentLocation.y + 1];
+                    newBoard[agentLocation.x][agentLocation.y + 1] = board[agentLocation.x][agentLocation.y + 1];//raising error if location is not accessible
                     newAgentLocation = new Point(agentLocation.x, agentLocation.y + 1);
                     break;
                 case "s":

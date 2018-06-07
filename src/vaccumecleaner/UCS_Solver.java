@@ -3,7 +3,7 @@ package vaccumecleaner;
 import java.util.*;
 
 class UCS_Solver extends BFS_Solver{
-    private Queue<State> fringe=new PriorityQueue<>(Comparator.comparingInt(state->state.cost));
+    private Queue<State> fringe=new PriorityQueue<>(Comparator.comparingInt(state->-state.cost));
     UCS_Solver(State initialState) {
         super(initialState);
         this.fringe.add(initialState);
